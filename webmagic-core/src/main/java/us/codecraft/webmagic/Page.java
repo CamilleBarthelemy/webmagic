@@ -152,13 +152,10 @@ public class Page {
      * @param requests requests
      * @param priority priority
      */
+
     public void addTargetRequests(Iterable<String> requests, long priority) {
-    	if(requests == null) {
-    		return;
-    	}
-    	
-        for (String req : requests) {
-        	addRequestIfValid(req, priority);
+        if (requests != null) {
+            requests.forEach(request -> addRequestIfValid(request, priority));
         }
     }
     
