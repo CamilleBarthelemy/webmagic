@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.util.Iterator;
 
 /**
  * @author code4crafter@gmail.com
@@ -19,7 +20,8 @@ import java.nio.charset.Charset;
  */
 public abstract class CharsetUtils {
 
-    private static Logger logger = LoggerFactory.getLogger(CharsetUtils.class);
+    private static final String CHARSET = "charset";
+    private static final Logger logger = LoggerFactory.getLogger(CharsetUtils.class);
 
     public static String detectCharset(String contentType, byte[] contentBytes) throws IOException {
         String charset;
@@ -37,12 +39,12 @@ public abstract class CharsetUtils {
         if (StringUtils.isNotEmpty(content)) {
             Document document = Jsoup.parse(content);
             Elements links = document.select("meta");
-            for (Element link : links) {
+            /**for (Element link : links) {
                 // 2.1、html4.01 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
                 String metaContent = link.attr("content");
-                String metaCharset = link.attr("charset");
-                if (metaContent.indexOf("charset") != -1) {
-                    metaContent = metaContent.substring(metaContent.indexOf("charset"), metaContent.length());
+                String metaCharset = link.attr(CHARSET);
+                if (metaContent.contains(CHARSET)) {
+                    metaContent = metaContent.substring(metaContent.indexOf(CHARSET), metaContent.length());
                     charset = metaContent.split("=")[1];
                     break;
                 }
@@ -51,6 +53,20 @@ public abstract class CharsetUtils {
                     charset = metaCharset;
                     break;
                 }
+            }*/
+            String metaContent = "";
+            String metaCharset = "";
+            Iterator<Element> iterator = links.iterator();
+            while (iterator.hasNext() && !metaContent.contains(CHARSET) && !StringUtils.isNotEmpty(metaCharset)) {
+                Element link = iterator.next();
+                metaContent = link.attr("content");
+                metaCharset = link.attr(CHARSET);
+            }
+            if (metaContent.contains(CHARSET)) {
+                metaContent = metaContent.substring(metaContent.indexOf(CHARSET), metaContent.length());
+                charset = metaContent.split("=")[1];
+            } else if (StringUtils.isNotEmpty(metaCharset)) {
+                charset = metaCharset;
             }
         }
         logger.debug("Auto get charset: {}", charset);
