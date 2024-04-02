@@ -21,7 +21,7 @@ public enum Status {
             }
         }
         //default value
-        return Init;
+        return INIT;
     }
 }
 
