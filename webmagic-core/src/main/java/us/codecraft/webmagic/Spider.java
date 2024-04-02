@@ -96,6 +96,8 @@ public class Spider implements Runnable, Task {
 
     protected boolean destroyWhenExit = true;
 
+    private ThreadManager threadManager;
+
     private InitManager initManager;
 
     private PageProcessorManager pageProcessorManager;
@@ -140,6 +142,7 @@ public class Spider implements Runnable, Task {
         this.lifecycleManager = new SpiderLifecycleManager(this);
         this.pageProcessorManager = new PageProcessorManager(pageProcessor, this);
         this.initManager = new InitManager(this);
+        this.threadManager = new ThreadManager(this);
     }
 
     /**
@@ -473,12 +476,7 @@ public class Spider implements Runnable, Task {
      * @return this
      */
     public Spider thread(int threadNum) {
-        checkIfRunning();
-        this.threadNum = threadNum;
-        if (threadNum <= 0) {
-            throw new IllegalArgumentException("threadNum should be more than one!");
-        }
-        return this;
+        return this.threadManager.thread(threadNum);
     }
 
     /**
@@ -489,13 +487,7 @@ public class Spider implements Runnable, Task {
      * @return this
      */
     public Spider thread(ExecutorService executorService, int threadNum) {
-        checkIfRunning();
-        this.threadNum = threadNum;
-        if (threadNum <= 0) {
-            throw new IllegalArgumentException("threadNum should be more than one!");
-        }
-        this.executorService = executorService;
-        return this;
+        return this.threadManager.thread(executorService, threadNum);
     }
 
     public boolean isExitWhenComplete() {
@@ -547,10 +539,7 @@ public class Spider implements Runnable, Task {
      * @since 0.4.1
      */
     public int getThreadAlive() {
-        if (threadPool == null) {
-            return 0;
-        }
-        return threadPool.getThreadAlive();
+        return this.threadManager.getThreadAlive();
     }
 
     /**
