@@ -64,6 +64,8 @@ import us.codecraft.webmagic.utils.WMCollections;
  */
 public class Spider implements Runnable, Task {
 
+    public Date startTime;
+
     protected Downloader downloader;
 
     protected List<Pipeline> pipelines = new ArrayList<>();
@@ -94,6 +96,8 @@ public class Spider implements Runnable, Task {
 
     protected boolean destroyWhenExit = true;
 
+    private InitManager initManager;
+
     private PageProcessorManager pageProcessorManager;
 
     private SpiderLifecycleManager lifecycleManager;
@@ -105,8 +109,6 @@ public class Spider implements Runnable, Task {
     private List<SpiderListener> spiderListeners;
 
     private final AtomicLong pageCount = new AtomicLong(0);
-
-    private Date startTime;
 
     private long emptySleepTime = 30000;
 
@@ -137,6 +139,7 @@ public class Spider implements Runnable, Task {
         this.site = pageProcessor.getSite();
         this.lifecycleManager = new SpiderLifecycleManager(this);
         this.pageProcessorManager = new PageProcessorManager(pageProcessor, this);
+        this.initManager = new InitManager(this);
     }
 
     /**
@@ -213,27 +216,7 @@ public class Spider implements Runnable, Task {
     }
 
     protected void initComponent() {
-        if (downloader == null) {
-            this.downloader = new HttpClientDownloader();
-        }
-        if (pipelines.isEmpty()) {
-            pipelines.add(new ConsolePipeline());
-        }
-        downloader.setThread(threadNum);
-        if (threadPool == null || threadPool.isShutdown()) {
-            if (executorService != null && !executorService.isShutdown()) {
-                threadPool = new CountableThreadPool(threadNum, executorService);
-            } else {
-                threadPool = new CountableThreadPool(threadNum);
-            }
-        }
-        if (startRequests != null) {
-            for (Request request : startRequests) {
-                addRequest(request);
-            }
-            startRequests.clear();
-        }
-        startTime = new Date();
+        this.initManager.initComponent();
     }
 
     @Override

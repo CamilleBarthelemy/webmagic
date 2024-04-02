@@ -14,7 +14,7 @@ public class SpiderLifecycleManager {
     }
 
     public void stop() {
-        if (spider.stat.compareAndSet(spider.STAT_RUNNING, spider.STAT_STOPPED)) {
+        if (spider.stat.compareAndSet(Spider.STAT_RUNNING, Spider.STAT_STOPPED)) {
             spider.logger.info("Spider " + spider.getUUID() + " stop success!");
         } else {
             spider.logger.info("Spider " + spider.getUUID() + " stop fail!");
