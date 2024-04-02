@@ -94,6 +94,8 @@ public class Spider implements Runnable, Task {
 
     protected boolean destroyWhenExit = true;
 
+    private PageProcessorManager pageProcessorManager;
+
     private SpiderLifecycleManager lifecycleManager;
 
     private ReentrantLock newUrlLock = new ReentrantLock();
@@ -134,6 +136,7 @@ public class Spider implements Runnable, Task {
         this.pageProcessor = pageProcessor;
         this.site = pageProcessor.getSite();
         this.lifecycleManager = new SpiderLifecycleManager(this);
+        this.pageProcessorManager = new PageProcessorManager(pageProcessor, this);
     }
 
     /**
@@ -274,7 +277,7 @@ public class Spider implements Runnable, Task {
                 @Override
                 public void run() {
                     try {
-                        processRequest(request);
+                        pageProcessorManager.processRequest(request);
                         onSuccess(request);
                     } catch (Exception e) {
                         ErrorHandler.onError(request, e, spiderListeners);
@@ -343,61 +346,9 @@ public class Spider implements Runnable, Task {
         initComponent();
         if (urls.length > 0) {
             for (String url : urls) {
-                processRequest(new Request(url));
+                this.pageProcessorManager.processRequest(new Request(url));
             }
         }
-    }
-
-    private void processRequest(Request request) {
-        Page page;
-        if (null != request.getDownloader()){
-            page = request.getDownloader().download(request,this);
-        }else {
-            page = downloader.download(request, this);
-        }
-        if (page.isDownloadSuccess()){
-            onDownloadSuccess(request, page);
-        } else {
-            onDownloaderFail(request);
-        }
-    }
-
-    private void onDownloadSuccess(Request request, Page page) {
-        if (site.getAcceptStatCode().contains(page.getStatusCode())){
-            pageProcessor.process(page);
-            extractAndAddRequests(page, spawnUrl);
-            if (!page.getResultItems().isSkip()) {
-                for (Pipeline pipeline : pipelines) {
-                    pipeline.process(page.getResultItems(), this);
-                }
-            }
-        } else {
-            logger.info("page status code error, page {} , code: {}", request.getUrl(), page.getStatusCode());
-        }
-        sleep(site.getSleepTime());
-    }
-
-    private void onDownloaderFail(Request request) {
-        if (site.getCycleRetryTimes() == 0) {
-            sleep(site.getSleepTime());
-        } else {
-            // for cycle retry
-            doCycleRetry(request);
-        }
-    }
-
-    private void doCycleRetry(Request request) {
-        Object cycleTriedTimesObject = request.getExtra(Request.CYCLE_TRIED_TIMES);
-        if (cycleTriedTimesObject == null) {
-            addRequest(SerializationUtils.clone(request).setPriority(0).putExtra(Request.CYCLE_TRIED_TIMES, 1));
-        } else {
-            int cycleTriedTimes = (Integer) cycleTriedTimesObject;
-            cycleTriedTimes++;
-            if (cycleTriedTimes < site.getCycleRetryTimes()) {
-                addRequest(SerializationUtils.clone(request).setPriority(0).putExtra(Request.CYCLE_TRIED_TIMES, cycleTriedTimes));
-            }
-        }
-        sleep(site.getRetrySleepTime());
     }
 
     protected void sleep(int time) {
@@ -529,11 +480,7 @@ public class Spider implements Runnable, Task {
     }
 
     public void stop() {
-        if (stat.compareAndSet(STAT_RUNNING, STAT_STOPPED)) {
-            logger.info("Spider " + getUUID() + " stop success!");
-        } else {
-            logger.info("Spider " + getUUID() + " stop fail!");
-        }
+        this.lifecycleManager.stop();
     }
 
     /**
