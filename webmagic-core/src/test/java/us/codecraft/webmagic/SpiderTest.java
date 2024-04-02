@@ -66,27 +66,6 @@ public class SpiderTest {
             public void setThread(int threadNum) {
 
             }
-        }).setScheduler(new Scheduler() {
-
-            private AtomicInteger count = new AtomicInteger();
-
-            private Random random = new Random();
-
-            @Override
-            public void push(Request request, Task task) {
-
-            }
-
-            @Override
-            public synchronized Request poll(Task task) {
-                if (count.incrementAndGet() > 1000) {
-                    return null;
-                }
-                if (random.nextInt(100)>90){
-                    return null;
-                }
-                return new Request("test");
-            }
         }).thread(10);
         spider.run();
     }

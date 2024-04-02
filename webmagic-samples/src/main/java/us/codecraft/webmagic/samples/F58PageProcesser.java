@@ -29,6 +29,6 @@ public class F58PageProcesser implements PageProcessor {
     }
 
     public static void main(String[] args) {
-        Spider.create(new F58PageProcesser()).setScheduler(new RedisScheduler("localhost")).addUrl("http://sh1.51a8.com/").run();
+        Spider.create(new F58PageProcesser()).addUrl("http://sh1.51a8.com/").run();
     }
 }

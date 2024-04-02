@@ -19,8 +19,7 @@ public class RequestUtils {
         List<Request> requests = new ArrayList<>();
         addUrlsToRequests(urls, requests);
         spider = spider.startRequest(requests)
-                .setSpawnUrl(spawnUrl)
-                .setScheduler(scheduler);
+                .setSpawnUrl(spawnUrl);
         if (startNow) {
             spider.runAsync();
         }

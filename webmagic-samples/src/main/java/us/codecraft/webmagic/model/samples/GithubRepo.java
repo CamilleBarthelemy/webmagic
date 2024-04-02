@@ -44,7 +44,7 @@ public class GithubRepo implements HasKey {
         OOSpider.create(Site.me().setSleepTime(0).setRetryTimes(3),
                 new JsonFilePageModelPipeline(), GithubRepo.class)
                 .addUrl("https://github.com/explore")
-                .setScheduler(new FileCacheQueueScheduler("/data/webmagic/cache/")).thread(15).run();
+                .thread(15).run();
     }
 
     @Override

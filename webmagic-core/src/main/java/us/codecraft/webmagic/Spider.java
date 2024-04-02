@@ -170,52 +170,6 @@ public class Spider implements Runnable, Task {
     }
 
     /**
-     * set scheduler for Spider
-     *
-     * @param scheduler scheduler
-     * @return this
-     * @see #setScheduler(us.codecraft.webmagic.scheduler.Scheduler)
-     */
-    @Deprecated
-    public Spider scheduler(Scheduler scheduler) {
-        return setScheduler(scheduler);
-    }
-
-    /**
-     * set scheduler for Spider
-     *
-     * @param scheduler scheduler
-     * @return this
-     * @see Scheduler
-     * @since 0.2.1
-     */
-    public Spider setScheduler(Scheduler scheduler) {
-        checkIfRunning();
-        Scheduler oldScheduler = this.scheduler;
-        this.scheduler = scheduler;
-        if (oldScheduler != null) {
-            Request request;
-            while ((request = oldScheduler.poll(this)) != null) {
-                this.scheduler.push(request, this);
-            }
-        }
-        return this;
-    }
-
-    /**
-     * add a pipeline for Spider
-     *
-     * @param pipeline pipeline
-     * @return this
-     * @see #addPipeline(us.codecraft.webmagic.pipeline.Pipeline)
-     * @deprecated
-     */
-    @Deprecated
-	public Spider pipeline(Pipeline pipeline) {
-        return addPipeline(pipeline);
-    }
-
-    /**
      * add a pipeline for Spider
      *
      * @param pipeline pipeline
@@ -230,20 +184,6 @@ public class Spider implements Runnable, Task {
     }
 
     /**
-     * set pipelines for Spider
-     *
-     * @param pipelines pipelines
-     * @return this
-     * @see Pipeline
-     * @since 0.4.1
-     */
-    public Spider setPipelines(List<Pipeline> pipelines) {
-        checkIfRunning();
-        this.pipelines = pipelines;
-        return this;
-    }
-
-    /**
      * clear the pipelines set
      *
      * @return this
@@ -251,19 +191,6 @@ public class Spider implements Runnable, Task {
     public Spider clearPipeline() {
         pipelines = new ArrayList<>();
         return this;
-    }
-
-    /**
-     * set the downloader of spider
-     *
-     * @param downloader downloader
-     * @return this
-     * @see #setDownloader(us.codecraft.webmagic.downloader.Downloader)
-     * @deprecated
-     */
-    @Deprecated
-	public Spider downloader(Downloader downloader) {
-        return setDownloader(downloader);
     }
 
     /**

@@ -73,7 +73,7 @@ public class News163 implements MultiPageModel {
 
     public static void main(String[] args) {
         OOSpider.create(Site.me(), News163.class).addUrl("http://news.163.com/13/0802/05/958I1E330001124J_2.html")
-                .scheduler(new RedisScheduler("localhost")).addPipeline(new MultiPagePipeline()).addPipeline(new ConsolePipeline()).run();
+                .addPipeline(new MultiPagePipeline()).addPipeline(new ConsolePipeline()).run();
     }
 
 }

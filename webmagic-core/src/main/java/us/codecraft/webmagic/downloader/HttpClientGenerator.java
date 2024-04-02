@@ -43,7 +43,7 @@ public class HttpClientGenerator {
     private static final int DEFAULT_MAX_PER_ROUTE = 100;
 
     public HttpClientGenerator() {
-        Registry<ConnectionSocketFactory> reg = RegistryBuilder.<>create()
+        Registry<ConnectionSocketFactory> reg = RegistryBuilder.<ConnectionSocketFactory>create()
                 .register("http", PlainConnectionSocketFactory.INSTANCE)
                 .register("https", buildSSLConnectionSocketFactory())
                 .build();

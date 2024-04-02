@@ -15,7 +15,6 @@ public class RecoverSample {
         String duplicate = "duplicate";
         Spider spider = new Spider(new SinaBlogProcessor());
         DuplicateRemover remover = new DuplicateStorageRemover(duplicate);
-        spider.setScheduler(new MmapQueueScheduler(remover, storage));
         spider.addUrl("http://blog.sina.com.cn/s/articlelist_1487828712_0_1.html")
                 .run();
     }

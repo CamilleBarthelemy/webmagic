@@ -59,7 +59,7 @@ public class AlexanderMcqueenGoodsProcessor implements PageProcessor {
     }
 
     public static void main(String[] args) {
-        Spider.create(new AlexanderMcqueenGoodsProcessor()).setScheduler(new PriorityScheduler())
+        Spider.create(new AlexanderMcqueenGoodsProcessor())
                 .addUrl("http://www.alexandermcqueen.cn/sitemap.asp?tskay=E2F1A848").thread(5).run();
     }
 }
