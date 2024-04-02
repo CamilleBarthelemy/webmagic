@@ -29,11 +29,11 @@ import static us.codecraft.webmagic.model.annotation.ExtractBy.Source.RawText;
  */
 class PageModelExtractor {
 
-    private List<Pattern> targetUrlPatterns = new ArrayList<Pattern>();
+    private List<Pattern> targetUrlPatterns = new ArrayList<>();
 
     private Selector targetUrlRegionSelector;
 
-    private List<Pattern> helpUrlPatterns = new ArrayList<Pattern>();
+    private List<Pattern> helpUrlPatterns = new ArrayList<>();
 
     private Selector helpUrlRegionSelector;
 
@@ -49,6 +49,26 @@ class PageModelExtractor {
         PageModelExtractor pageModelExtractor = new PageModelExtractor();
         pageModelExtractor.init(clazz);
         return pageModelExtractor;
+    }
+
+    Class getClazz() {
+        return clazz;
+    }
+
+    List<Pattern> getTargetUrlPatterns() {
+        return targetUrlPatterns;
+    }
+
+    List<Pattern> getHelpUrlPatterns() {
+        return helpUrlPatterns;
+    }
+
+    Selector getTargetUrlRegionSelector() {
+        return targetUrlRegionSelector;
+    }
+
+    Selector getHelpUrlRegionSelector() {
+        return helpUrlRegionSelector;
     }
 
     private void init(Class clazz) {
@@ -343,25 +363,5 @@ class PageModelExtractor {
             fieldExtractor.getSetterMethod().invoke(o, value);
         }
         fieldExtractor.getField().set(o, value);
-    }
-
-    Class getClazz() {
-        return clazz;
-    }
-
-    List<Pattern> getTargetUrlPatterns() {
-        return targetUrlPatterns;
-    }
-
-    List<Pattern> getHelpUrlPatterns() {
-        return helpUrlPatterns;
-    }
-
-    Selector getTargetUrlRegionSelector() {
-        return targetUrlRegionSelector;
-    }
-
-    Selector getHelpUrlRegionSelector() {
-        return helpUrlRegionSelector;
     }
 }
