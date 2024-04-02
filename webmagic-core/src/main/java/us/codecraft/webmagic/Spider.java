@@ -141,8 +141,7 @@ public class Spider implements Runnable, Task {
      * @return this
      */
     public Spider startUrls(List<String> startUrls) {
-        checkIfRunning();
-        this.startRequests = UrlUtils.convertToRequests(startUrls);
+        RequestUtils.startWithUrls(startUrls, this, spawnUrl, scheduler, true);
         return this;
     }
 
@@ -154,7 +153,6 @@ public class Spider implements Runnable, Task {
      * @return this
      */
     public Spider startRequest(List<Request> startRequests) {
-        checkIfRunning();
         this.startRequests = startRequests;
         return this;
     }
@@ -499,11 +497,7 @@ public class Spider implements Runnable, Task {
     }
 
     protected void extractAndAddRequests(Page page, boolean spawnUrl) {
-        if (spawnUrl && CollectionUtils.isNotEmpty(page.getTargetRequests())) {
-            for (Request request : page.getTargetRequests()) {
-                addRequest(request);
-            }
-        }
+        RequestUtils.extractAndAddRequestsFromPage(page, this, spawnUrl);
     }
 
     private void addRequest(Request request) {
@@ -614,7 +608,7 @@ public class Spider implements Runnable, Task {
         }
     }
 
-    private void signalNewUrl() {
+    public void signalNewUrl() {
         try {
             newUrlLock.lock();
             newUrlCondition.signalAll();
