@@ -53,7 +53,5 @@ public class ThreadManager {
         }
         return spider.threadPool.getThreadAlive();
     }
-
-
 }
 
