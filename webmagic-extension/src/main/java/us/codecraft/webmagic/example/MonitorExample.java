@@ -20,7 +20,7 @@ public class MonitorExample {
 
         SpiderMonitor.instance().register(zhihuSpider);
         SpiderMonitor.instance().register(githubSpider);
-        zhihuSpider.start();
-        githubSpider.start();
+        zhihuSpider.runAsync();
+        githubSpider.runAsync();
     }
 }

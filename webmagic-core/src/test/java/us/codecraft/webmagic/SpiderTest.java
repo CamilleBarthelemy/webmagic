@@ -25,11 +25,11 @@ public class SpiderTest {
                 System.out.println(1);
             }
         }).thread(1).addUrl("http://www.oschina.net/");
-        spider.start();
+        spider.runAsync();
         Thread.sleep(10000);
         spider.stop();
         Thread.sleep(10000);
-        spider.start();
+        spider.runAsync();
         Thread.sleep(10000);
     }
 

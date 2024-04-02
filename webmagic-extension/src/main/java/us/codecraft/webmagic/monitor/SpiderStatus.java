@@ -70,7 +70,7 @@ public class SpiderStatus implements SpiderStatusMXBean {
     }
 
     public void start() {
-        spider.start();
+        spider.runAsync();
     }
 
     public void stop() {

@@ -38,7 +38,7 @@ public class Kr36NewsModel {
 
             }
         }, Kr36NewsModel.class).thread(20).addUrl("http://www.36kr.com/");
-        thread.start();
+        thread.runAsync();
         SpiderMonitor spiderMonitor = SpiderMonitor.instance();
         spiderMonitor.register(thread);
     }

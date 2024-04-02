@@ -94,6 +94,8 @@ public class Spider implements Runnable, Task {
 
     protected boolean destroyWhenExit = true;
 
+    private SpiderLifecycleManager lifecycleManager;
+
     private ReentrantLock newUrlLock = new ReentrantLock();
 
     private Condition newUrlCondition = newUrlLock.newCondition();
@@ -131,6 +133,7 @@ public class Spider implements Runnable, Task {
     public Spider(PageProcessor pageProcessor) {
         this.pageProcessor = pageProcessor;
         this.site = pageProcessor.getSite();
+        this.lifecycleManager = new SpiderLifecycleManager(this);
     }
 
     /**
@@ -424,9 +427,7 @@ public class Spider implements Runnable, Task {
     }
 
     public void runAsync() {
-        Thread thread = new Thread(this);
-        thread.setDaemon(false);
-        thread.start();
+        this.lifecycleManager.runAsync();
     }
 
     /**
@@ -525,10 +526,6 @@ public class Spider implements Runnable, Task {
         } finally {
             newUrlLock.unlock();
         }
-    }
-
-    public void start() {
-        runAsync();
     }
 
     public void stop() {
