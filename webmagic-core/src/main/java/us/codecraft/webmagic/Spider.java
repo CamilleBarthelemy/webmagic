@@ -90,12 +90,6 @@ public class Spider implements Runnable, Task {
 
     protected boolean exitWhenComplete = true;
 
-    protected final static int STAT_INIT = 0;
-
-    protected final static int STAT_RUNNING = 1;
-
-    protected final static int STAT_STOPPED = 2;
-
     protected boolean spawnUrl = true;
 
     protected boolean destroyWhenExit = true;
@@ -111,6 +105,12 @@ public class Spider implements Runnable, Task {
     private Date startTime;
 
     private long emptySleepTime = 30000;
+
+    protected static final int STAT_INIT = 0;
+
+    protected static final int STAT_RUNNING = 1;
+
+    protected static final int STAT_STOPPED = 2;
 
     /**
      * create a spider with pageProcessor.
@@ -251,7 +251,7 @@ public class Spider implements Runnable, Task {
      * @return this
      */
     public Spider clearPipeline() {
-        pipelines = new ArrayList<Pipeline>();
+        pipelines = new ArrayList<>();
         return this;
     }
 
@@ -464,7 +464,6 @@ public class Spider implements Runnable, Task {
             logger.info("page status code error, page {} , code: {}", request.getUrl(), page.getStatusCode());
         }
         sleep(site.getSleepTime());
-        return;
     }
 
     private void onDownloaderFail(Request request) {
@@ -708,31 +707,6 @@ public class Spider implements Runnable, Task {
      */
     public Status getStatus() {
         return Status.fromValue(stat.get());
-    }
-
-
-    public enum Status {
-        Init(0), Running(1), Stopped(2);
-
-        private Status(int value) {
-            this.value = value;
-        }
-
-        private int value;
-
-        int getValue() {
-            return value;
-        }
-
-        public static Status fromValue(int value) {
-            for (Status status : Status.values()) {
-                if (status.getValue() == value) {
-                    return status;
-                }
-            }
-            //default value
-            return Init;
-        }
     }
 
     /**
