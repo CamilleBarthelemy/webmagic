@@ -263,7 +263,7 @@ public class Spider implements Runnable, Task {
                 public void run() {
                     try {
                         pageProcessorManager.processRequest(request);
-                        onSuccess(request);
+                        SuccessHandler.onSuccess(request, spiderListeners);
                     } catch (Exception e) {
                         ErrorHandler.onError(request, e, spiderListeners);
                         logger.error("process request " + request + " error", e);
@@ -280,14 +280,6 @@ public class Spider implements Runnable, Task {
             close();
         }
         logger.info("Spider {} closed! {} pages downloaded.", getUUID(), pageCount.get());
-    }
-
-    protected void onSuccess(Request request) {
-        if (CollectionUtils.isNotEmpty(spiderListeners)) {
-            for (SpiderListener spiderListener : spiderListeners) {
-                spiderListener.onSuccess(request);
-            }
-        }
     }
 
     private void checkRunningStat() {
