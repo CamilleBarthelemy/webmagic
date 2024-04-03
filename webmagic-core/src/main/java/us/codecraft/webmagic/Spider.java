@@ -9,19 +9,15 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.SerializationUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import us.codecraft.webmagic.downloader.Downloader;
-import us.codecraft.webmagic.downloader.HttpClientDownloader;
 import us.codecraft.webmagic.pipeline.CollectorPipeline;
-import us.codecraft.webmagic.pipeline.ConsolePipeline;
 import us.codecraft.webmagic.pipeline.Pipeline;
 import us.codecraft.webmagic.pipeline.ResultItemsCollectorPipeline;
 import us.codecraft.webmagic.processor.PageProcessor;
@@ -66,6 +62,10 @@ public class Spider implements Runnable, Task {
 
     public Date startTime;
 
+    public ReentrantLock newUrlLock = new ReentrantLock();
+
+    public Condition newUrlCondition = newUrlLock.newCondition();
+
     protected Downloader downloader;
 
     protected List<Pipeline> pipelines = new ArrayList<>();
@@ -96,6 +96,8 @@ public class Spider implements Runnable, Task {
 
     protected boolean destroyWhenExit = true;
 
+    private UrlManager urlManager;
+
     private ThreadManager threadManager;
 
     private InitManager initManager;
@@ -104,15 +106,11 @@ public class Spider implements Runnable, Task {
 
     private SpiderLifecycleManager lifecycleManager;
 
-    private ReentrantLock newUrlLock = new ReentrantLock();
-
-    private Condition newUrlCondition = newUrlLock.newCondition();
-
     private List<SpiderListener> spiderListeners;
 
     private final AtomicLong pageCount = new AtomicLong(0);
 
-    private long emptySleepTime = 30000;
+    public long emptySleepTime = 30000;
 
     protected static final int STAT_INIT = 0;
 
@@ -143,6 +141,7 @@ public class Spider implements Runnable, Task {
         this.pageProcessorManager = new PageProcessorManager(pageProcessor, this);
         this.initManager = new InitManager(this);
         this.threadManager = new ThreadManager(this);
+        this.urlManager = new UrlManager(this);
     }
 
     /**
@@ -373,12 +372,8 @@ public class Spider implements Runnable, Task {
      * @param urls urls
      * @return this
      */
-    public Spider addUrl(String... urls) {
-        for (String url : urls) {
-            addRequest(new Request(url));
-        }
-        signalNewUrl();
-        return this;
+    public UrlManager addUrl(String... urls) {
+        return this.urlManager = new UrlManager(this);
     }
 
     /**
@@ -438,31 +433,11 @@ public class Spider implements Runnable, Task {
      * @return isInterrupted
      */
     private boolean waitNewUrl() {
-        // now there may not be any thread live
-        newUrlLock.lock();
-        try {
-            //double check，unnecessary, unless very fast concurrent
-            if (threadPool.getThreadAlive() == 0) {
-                return false;
-            }
-            //wait for amount of time
-            newUrlCondition.await(emptySleepTime, TimeUnit.MILLISECONDS);
-            return false;
-        } catch (InterruptedException e) {
-            // logger.warn("waitNewUrl - interrupted, error {}", e);
-            return true;
-        } finally {
-            newUrlLock.unlock();
-        }
+        return this.urlManager.waitNewUrl();
     }
 
     public void signalNewUrl() {
-        try {
-            newUrlLock.lock();
-            newUrlCondition.signalAll();
-        } finally {
-            newUrlLock.unlock();
-        }
+        this.urlManager.signalNewUrl();
     }
 
     public void stop() {
