@@ -68,8 +68,9 @@ public class HtmlNode extends AbstractSelectable {
 
     @Override
     public Selectable $(String selector, String attrName) {
+        ElementUtil elementUtil = new ElementUtil();
         CssSelector cssSelector = Selectors.$(selector, attrName);
-        return selectElements(cssSelector);
+        return elementUtil.selectElements(cssSelector);
     }
 
     @Override
